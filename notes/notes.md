@@ -1,5 +1,15 @@
 # Summary notes
 
+
+Some Core basics
+__
+
+Installing elixir provides 3 executable: iex, elixir & elixirc
+
+- `elixir simple.exs` -- elixir is for executing elixir scripts
+- elixirc -- is for compilation & execution
+- iex command runs interactive shell
+
 Keyword Lists
 ____
 
@@ -171,7 +181,7 @@ iex> receive do
 
 ```
 
-If we want the failure in one process to propagate to another one, we should link them. 
+If we want the failure in one process to propagate to another one, we should link them.
 This can be done with spawn_link/1:
 
 ```
@@ -200,9 +210,8 @@ Tasks build on top of the spawn functions to provide better error reports and in
 
 Instead of spawn/1 and spawn_link/1, we use Task.start/1 and Task.start_link/1 which return {:ok, pid} rather than just the PID. This is what enables tasks to be used in supervision trees. Furthermore, Task provides convenience functions, like Task.async/1 and Task.await/1, and functionality to ease distribution.
 
-
 State
-_____
+__
 
 Processes can be used to maintain state with in application through using their PIDs as addresses.
 
@@ -225,4 +234,101 @@ iex> Agent.update(pid, fn map -> Map.put(map, :hello, :world) end) # add value t
 :ok
 iex> Agent.get(pid, fn map -> Map.get(map, :hello) end) # get value
 :world
+```
+
+Supervisors
+__
+
+Supervisors provide the ability to restart and shutdown process i.e monitor.
+
+Import, require, use
+__
+
+import Module brings all the Functions and Macros of Module un-namespaced into your module.
+
+require Module allows you to use macros of Module but does not import them. (Functions of Module are always available namespaced.)
+
+use Module first requires module and then calls the __using__ macro on Module.
+
+Mix and iex
+__
+
+[tutorial](https://elixirschool.com/en/lessons/basics/mix/)
+
+Elegant error/exception handling
+__
+
+[Ok macro](https://github.com/CrowdHailer/OK)
+
+```elixir
+Experimenting with this code.
+
+OK.try do
+  user <- fetch_user(1)
+  cart <- fetch_cart(1)
+  order = checkout(cart, user)
+  save_order(order)
+end
+
+Ok.with/1 supports an else block that can be used for handling error values.
+
+OK.with do
+  a <- safe_div(8, 2)
+  _ <- safe_div(a, 0)
+else
+  :zero_division -> # matches on reason
+    {:ok, :inf}     # must return a new success or failure
+end
+
+The cart example above is equivalent to
+
+with {:ok, user} <- fetch_user(1),
+     {:ok, cart} <- fetch_cart(1),
+     order = checkout(cart, user),
+     {:ok, order_id} <- save_order(order)
+do
+   {:ok, order_id}
+end
+
+```
+
+Concurrency with tasks example
+__
+
+[see more from this blog](https://blog.codeship.com/concurrency-abstractions-in-elixir/)
+
+```elixir
+defmodule Statuses do
+  def map(urls) do
+    urls
+      |> Enum.map(&(Task.async(fn -> process(&1) end)))
+      |> Enum.map(&(Task.await(&1)))
+  end
+
+  def process(url) do
+    case HTTPoison.get(url) do
+      {:ok, %HTTPoison.Response{status_code: status_code}} ->
+        {url, status_code}
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        {:error, reason}
+    end
+  end
+end
+
+```
+
+cases
+__
+
+If you want to pattern match against an existing variable, you need to use the ^ operator:
+
+``` elixir
+iex> x = 1
+1
+iex> case 10 do
+...>   ^x -> "Won't match"
+...>   _ -> "Will match"
+...> end
+"Will match"
+
 ```
