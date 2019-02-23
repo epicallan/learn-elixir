@@ -331,4 +331,12 @@ iex> case 10 do
 ...> end
 "Will match"
 
+
 ```
+## Using credo as stand alone install
+
+https://github.com/rrrene/credo#using-credo-as-stand-alone
+
+## Elixir style guide
+
+https://github.com/christopheradams/elixir_style_guide
