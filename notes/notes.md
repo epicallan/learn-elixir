@@ -340,3 +340,7 @@ https://github.com/rrrene/credo#using-credo-as-stand-alone
 ## Elixir style guide
 
 https://github.com/christopheradams/elixir_style_guide
+
+## Phoenix templating notes
+
+https://blog.robphoenix.com/elixir/notes-on-elixir-templating-with-eex/
